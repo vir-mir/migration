@@ -1,4 +1,7 @@
 <?
+    error_reporting(E_ALL);
+    set_time_limit(0);
+
     function autoload($name) {
         $name = array_merge((array)'lib', explode('\\', $name));
         $name = __DIR__ . '/../../' . implode('/', $name) . '.php';
@@ -11,6 +14,10 @@
 
     if (isset($_GET['action']) && $_GET['action']==='add_table') {
         $kernel->addTable($_GET['table']);
+    }
+
+    if (isset($_GET['action']) && $_GET['action']==='remove_table') {
+        $kernel->removeTable($_GET['table']);
     }
 
     if (isset($_GET['action']) && $_GET['action']==='field') {
@@ -37,11 +44,12 @@
         }
     }
 
-
     if (!empty($_GET)) {
         header('Location: /vir-mir/migration/lib/Migration/');
         exit;
     }
+
+
 
     $modifiedTable = $kernel->getModifiedTable();
     $newTable = $kernel->getNewTables();
@@ -66,7 +74,7 @@
 <div class="container">
     <h1>Migration!</h1>
 
-    <? if (!empty($newTable)) : ?>
+    <? if (isset($newTable['new'])) : ?>
         <h3>Новые таблицы</h3>
         <table class="table table-responsive table-hover">
             <thead>
@@ -76,11 +84,36 @@
                 </tr>
             </thead>
             <tbody>
-                <? foreach($kernel->getNewTables() as $table): ?>
+                <? foreach($newTable['new'] as $table): ?>
                     <tr>
                         <td><?=$table?></td>
                         <td>
                             <a title="Добавить" href="?table=<?=$table?>&action=add_table" class="btn btn-primary btn-sm">
+                                <i class="glyphicon glyphicon-plus"></i>
+                            </a>
+                        </td>
+                    </tr>
+                <? endforeach; ?>
+            </tbody>
+        </table>
+
+    <? endif; ?>
+
+    <? if (isset($newTable['remove'])) : ?>
+        <h3>Удалить таблицы</h3>
+        <table class="table table-responsive table-hover">
+            <thead>
+                <tr>
+                    <th>Имя</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                <? foreach($newTable['remove'] as $table): ?>
+                    <tr>
+                        <td><?=$table?></td>
+                        <td>
+                            <a title="Добавить" href="?table=<?=$table?>&action=remove_table" class="btn btn-primary btn-sm">
                                 <i class="glyphicon glyphicon-plus"></i>
                             </a>
                         </td>

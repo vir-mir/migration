@@ -13,8 +13,8 @@ use Migration\DataBase;
 class Kernel {
 
     public function run() {
-        DataBase::connectDB('wp', 'root', '', 'db1', true);
-        DataBase::connectDB('wp', 'root', '', 'db2', false);
+        DataBase::connectDB('wp', 'root', '', 'komtender', true);
+        DataBase::connectDB('78.47.33.94', 'ktd', 'komt3099', 'komtender', false);
     }
 
 
@@ -22,7 +22,12 @@ class Kernel {
         $dbTablesDebug = $this->detTablesDebug();
         $dbTablesReliz = $this->detTablesReliz();
         $dbTables = array_merge(array_diff($dbTablesDebug, $dbTablesReliz));
-        return $dbTables;
+        $dbTablesRemove = array_merge(array_diff($dbTablesReliz, $dbTablesDebug));
+        $table = array();
+        if ($dbTables) $table['new'] = $dbTables;
+        if ($dbTablesRemove) $table['remove'] = $dbTablesRemove;
+
+        return $table;
     }
 
     public function addField($table, $field) {
@@ -67,11 +72,18 @@ class Kernel {
         return DataBase::getReliz()->query($ddl);
     }
 
+    public function removeTable($table) {
+        return DataBase::getReliz()->query("DROP TABLE `{$table}`");
+    }
+
     public function getModifiedTable() {
         $dbTablesDebug = $this->detTablesDebug();
         $dbTablesReliz = $this->detTablesReliz();
         $dbTables = array_flip(array_unique(array_merge($dbTablesDebug, $dbTablesReliz)));
-        $dbTables = array_merge(array_diff_key($dbTables, array_flip($this->getNewTables())));
+        $new = $this->getNewTables();
+        $old = isset($new['remove'])?$new['remove']:array();
+        $new = isset($new['new'])?$new['new']:array();
+        $dbTables = array_merge(array_diff_key($dbTables, array_flip(array_merge($new, $old))));
         $this->comparison($dbTables);
         return $dbTables;
     }
