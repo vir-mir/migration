@@ -1,0 +1,27 @@
+{
+    "name": "vir-mir/migration",
+    "type": "library",
+    "description": "Migrating databases to php",
+    "keywords": ["migration"],
+    "homepage": "http://blog.vir-mir.ru",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Alexey Firsov",
+            "email": "info@vir-mir.ru"
+        }
+    ],
+    "require": {
+        "php": ">=5.2.4"
+    },
+    "autoload": {
+        "psr-0" : {
+            "Migration\\" : "lib/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.1-dev"
+        }
+    }
+}
