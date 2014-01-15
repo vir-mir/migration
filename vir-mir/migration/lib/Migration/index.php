@@ -100,7 +100,7 @@
     <? endif; ?>
 
     <? if (isset($newTable['remove'])) : ?>
-        <h3>Удалить таблицы</h3>
+        <h3>Затянуть таблицы</h3>
         <table class="table table-responsive table-hover">
             <thead>
                 <tr>

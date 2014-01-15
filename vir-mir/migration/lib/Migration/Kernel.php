@@ -14,7 +14,7 @@ class Kernel {
 
     public function run() {
         DataBase::connectDB('wp', 'root', '', 'komtender', true);
-        DataBase::connectDB('78.47.33.94', 'ktd', 'komt3099', 'komtender', false);
+        DataBase::connectDB('wp', 'root', '', 'komtender2', false);
     }
 
 
@@ -73,7 +73,8 @@ class Kernel {
     }
 
     public function removeTable($table) {
-        return DataBase::getReliz()->query("DROP TABLE `{$table}`");
+        $ddl = $this->getDDLTable($table, 'getReliz');
+        return DataBase::getDebug()->query($ddl);
     }
 
     public function getModifiedTable() {
