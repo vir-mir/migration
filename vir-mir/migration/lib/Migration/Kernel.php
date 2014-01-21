@@ -12,11 +12,116 @@ use Migration\DataBase;
 
 class Kernel {
 
-    public function run() {
-        DataBase::connectDB('wp', 'root', '', 'komtender', true);
-        DataBase::connectDB('wp', 'root', '', 'komtender2', false);
+    const PREF_FALSE_LOG = 'NONE';
+
+    private $conf;
+    private $log = array();
+    public  $logName;
+
+    public function __construct() {
+        $this->conf = include_once __DIR__ . '/../../config.php';
+        $this->logName = __DIR__ . '/../../log/'.time().'.log';
     }
 
+    public function run($reversion=false) {
+        $dbReliz = $this->getCongig('db_reliz');
+        $dbDebug = $this->getCongig('db_debug');
+
+        DataBase::connectDB($dbReliz['host'], $dbReliz['uname'], $dbReliz['upas'], $dbReliz['dbname'], !$reversion);
+        DataBase::connectDB($dbDebug['host'], $dbDebug['uname'], $dbDebug['upas'], $dbDebug['dbname'], $reversion);
+    }
+
+    public function getDbNameDebug() {
+        return DataBase::$dbDebugName;
+    }
+
+    public function getDbNameReliz() {
+        return DataBase::$dbRelizName;
+    }
+
+    public function & getCongig($name=null) {
+        if (!is_null($name)) return $this->conf[$name];
+        else return $this->conf;
+    }
+
+    public function getLog() {
+        return file_get_contents($this->logName);
+    }
+
+    public function allMigration() {
+        $modifiedTable = $this->getModifiedTable();
+        $newTable = $this->getNewTables();
+
+        if (isset($newTable["new"])) {
+            foreach ($newTable["new"] as $table) {
+                $this->addLog("Добавление таблицы '{$table}'", $this->addTable($table));
+            }
+        }
+
+        if (isset($newTable["remove"])) {
+            foreach ($newTable["remove"] as $table) {
+                $this->addLog("Затягивание таблицы '{$table}'", $this->removeTable($table));
+            }
+        }
+        if (!empty($modifiedTable)) {
+            foreach ($modifiedTable as $table => $data) {
+                $this->addLog("Страт изменений в таблицы '{$table}'.", self::PREF_FALSE_LOG);
+                if (isset($data['field'])) {
+                    $this->addLog("Страт изменений полей в таблицы '{$table}'.", self::PREF_FALSE_LOG);
+                    foreach (array_keys($data['field']['new']) as $p) {
+                        $this->addLog("Добавление поля '{$p}' в таблицу '{$table}'", $this->addField($table, $p));
+                    } unset($p);
+
+                    foreach (array_keys($data['field']['remove']) as $p) {
+                        $this->addField($table, $p);
+                        $this->addLog("Удаление поля '{$p}' в таблицы '{$table}'", $this->removeField($table, $p));
+                    } unset($p);
+
+                    foreach (array_keys($data['field']['comparison']) as $p) {
+                        $this->addField($table, $p);
+                        $this->addLog("Изменение поля '{$p}' в таблицы '{$table}'", $this->changeField($table, $p));
+                    } unset($p);
+
+                    $this->addLog("Конец изменений полей в таблицы '{$table}'.", self::PREF_FALSE_LOG);
+                }
+
+                if (isset($data['index'])) {
+                    $this->addLog("Страт изменений индексов в таблицы '{$table}'.", self::PREF_FALSE_LOG);
+                    foreach (array_keys($data['field']['new']) as $p) {
+                        $this->addLog("Добавление индекса '{$p}' в таблицу '{$table}'", $this->addIndex($table, $p));
+                    } unset($p);
+
+                    foreach (array_keys($data['field']['remove']) as $p) {
+                        $this->addField($table, $p);
+                        $this->addLog("Удаление индекса '{$p}' в таблицы '{$table}'", $this->removeIndex($table, $p));
+                    } unset($p);
+
+                    foreach (array_keys($data['field']['comparison']) as $p) {
+                        $this->addField($table, $p);
+                        $this->addLog("Изменение индекса '{$p}' в таблицы '{$table}'", $this->changeIndex($table, $p));
+                    } unset($p);
+
+                    $this->addLog("Конец изменений индексов в таблицы '{$table}'.", self::PREF_FALSE_LOG);
+                }
+
+                $this->addLog("Конец изменений в таблицы '{$table}'.", self::PREF_FALSE_LOG);
+            }
+        }
+
+
+        $this->setLog();
+    }
+
+    public function addLog($name, $isTrue) {
+        if ($isTrue!='NONE') $name .= $isTrue?" прошло успешно!":" вызвало ошибку!!!";
+        array_push($this->log, $name);
+        return $this;
+    }
+
+    public function setLog() {
+        $log = implode("\r\n", $this->log);
+        file_put_contents($this->logName, $log);
+    }
 
     public function getNewTables() {
         $dbTablesDebug = $this->detTablesDebug();
@@ -49,8 +154,11 @@ class Kernel {
 
     public function removeIndex($table, $index) {
         $ddl = $this->getIndexInfoName($table, $index, 'getReliz');
-        $ddl = "ALTER TABLE `{$table}` DROP {$ddl['name']}";
-        return DataBase::getReliz()->query($ddl);
+        if (isset($ddl['name'])) {
+            $ddl = "ALTER TABLE `{$table}` DROP {$ddl['name']}";
+            return DataBase::getReliz()->query($ddl);
+        }
+        return true;
     }
 
     public function changeField($table, $field) {
