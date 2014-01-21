@@ -1,14 +1,14 @@
 <?php
 
 return array(
-    'db_debug' => array( // настройки для БД из которой мегрировать
+    'db_debug' => array( // Р”Р‘ РёР· РєРѕС‚РѕСЂРѕР№ РјРёРіСЂРёСЂРѕРІР°С‚СЊ
         'host' => 'wp',
         'uname' => 'root',
         'upas' => '',
         'dbname' => 'db2',
     ),
 
-    'db_reliz' => array( // настройки для БД в которую мегрировать
+    'db_reliz' => array( // Р”Р‘ РІ РєРѕС‚РѕСЂСѓСЋ РјРёРіСЂРёСЂРѕРІР°С‚СЊ
         'host' => 'wp',
         'uname' => 'root',
         'upas' => '',
@@ -16,6 +16,6 @@ return array(
     ),
 
 
-    'remove_log' => false, // Удолять лог?
+    'remove_log' => false, // РЈРґРѕР»СЏС‚СЊ Р»РѕРі?
 
 );

@@ -54,57 +54,57 @@ class Kernel {
 
         if (isset($newTable["new"])) {
             foreach ($newTable["new"] as $table) {
-                $this->addLog("Äîáàâëåíèå òàáëèöû '{$table}'", $this->addTable($table));
+                $this->addLog("Ð”Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¸Ðµ Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ñ‹ '{$table}'", $this->addTable($table));
             }
         }
 
         if (isset($newTable["remove"])) {
             foreach ($newTable["remove"] as $table) {
-                $this->addLog("Çàòÿãèâàíèå òàáëèöû '{$table}'", $this->removeTable($table));
+                $this->addLog("Ð—Ð°Ñ‚ÑÐ³Ð¸Ð²Ð°Ð½Ð¸Ðµ Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ñ‹ '{$table}'", $this->removeTable($table));
             }
         }
         if (!empty($modifiedTable)) {
             foreach ($modifiedTable as $table => $data) {
-                $this->addLog("Ñòðàò èçìåíåíèé â òàáëèöû '{$table}'.", self::PREF_FALSE_LOG);
+                $this->addLog("Ð¡Ñ‚Ñ€Ð°Ñ‚ Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ð¹ Ð² Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ñ‹ '{$table}'.", self::PREF_FALSE_LOG);
                 if (isset($data['field'])) {
-                    $this->addLog("Ñòðàò èçìåíåíèé ïîëåé â òàáëèöû '{$table}'.", self::PREF_FALSE_LOG);
+                    $this->addLog("Ð¡Ñ‚Ñ€Ð°Ñ‚ Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ð¹ Ð¿Ð¾Ð»ÐµÐ¹ Ð² Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ñ‹ '{$table}'.", self::PREF_FALSE_LOG);
                     foreach (array_keys($data['field']['new']) as $p) {
-                        $this->addLog("Äîáàâëåíèå ïîëÿ '{$p}' â òàáëèöó '{$table}'", $this->addField($table, $p));
+                        $this->addLog("Ð”Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¿Ð¾Ð»Ñ '{$p}' Ð² Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ñƒ '{$table}'", $this->addField($table, $p));
                     } unset($p);
 
                     foreach (array_keys($data['field']['remove']) as $p) {
                         $this->addField($table, $p);
-                        $this->addLog("Óäàëåíèå ïîëÿ '{$p}' â òàáëèöû '{$table}'", $this->removeField($table, $p));
+                        $this->addLog("Ð£Ð´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð¿Ð¾Ð»Ñ '{$p}' Ð² Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ñ‹ '{$table}'", $this->removeField($table, $p));
                     } unset($p);
 
                     foreach (array_keys($data['field']['comparison']) as $p) {
                         $this->addField($table, $p);
-                        $this->addLog("Èçìåíåíèå ïîëÿ '{$p}' â òàáëèöû '{$table}'", $this->changeField($table, $p));
+                        $this->addLog("Ð˜Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ðµ Ð¿Ð¾Ð»Ñ '{$p}' Ð² Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ñ‹ '{$table}'", $this->changeField($table, $p));
                     } unset($p);
 
-                    $this->addLog("Êîíåö èçìåíåíèé ïîëåé â òàáëèöû '{$table}'.", self::PREF_FALSE_LOG);
+                    $this->addLog("ÐšÐ¾Ð½ÐµÑ† Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ð¹ Ð¿Ð¾Ð»ÐµÐ¹ Ð² Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ñ‹ '{$table}'.", self::PREF_FALSE_LOG);
                 }
 
                 if (isset($data['index'])) {
-                    $this->addLog("Ñòðàò èçìåíåíèé èíäåêñîâ â òàáëèöû '{$table}'.", self::PREF_FALSE_LOG);
+                    $this->addLog("Ð¡Ñ‚Ñ€Ð°Ñ‚ Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ð¹ Ð¸Ð½Ð´ÐµÐºÑÐ¾Ð² Ð² Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ñ‹ '{$table}'.", self::PREF_FALSE_LOG);
                     foreach (array_keys($data['field']['new']) as $p) {
-                        $this->addLog("Äîáàâëåíèå èíäåêñà '{$p}' â òàáëèöó '{$table}'", $this->addIndex($table, $p));
+                        $this->addLog("Ð”Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¸Ð½Ð´ÐµÐºÑÐ° '{$p}' Ð² Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ñƒ '{$table}'", $this->addIndex($table, $p));
                     } unset($p);
 
                     foreach (array_keys($data['field']['remove']) as $p) {
                         $this->addField($table, $p);
-                        $this->addLog("Óäàëåíèå èíäåêñà '{$p}' â òàáëèöû '{$table}'", $this->removeIndex($table, $p));
+                        $this->addLog("Ð£Ð´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð¸Ð½Ð´ÐµÐºÑÐ° '{$p}' Ð² Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ñ‹ '{$table}'", $this->removeIndex($table, $p));
                     } unset($p);
 
                     foreach (array_keys($data['field']['comparison']) as $p) {
                         $this->addField($table, $p);
-                        $this->addLog("Èçìåíåíèå èíäåêñà '{$p}' â òàáëèöû '{$table}'", $this->changeIndex($table, $p));
+                        $this->addLog("Ð˜Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ðµ Ð¸Ð½Ð´ÐµÐºÑÐ° '{$p}' Ð² Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ñ‹ '{$table}'", $this->changeIndex($table, $p));
                     } unset($p);
 
-                    $this->addLog("Êîíåö èçìåíåíèé èíäåêñîâ â òàáëèöû '{$table}'.", self::PREF_FALSE_LOG);
+                    $this->addLog("ÐšÐ¾Ð½ÐµÑ† Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ð¹ Ð¸Ð½Ð´ÐµÐºÑÐ¾Ð² Ð² Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ñ‹ '{$table}'.", self::PREF_FALSE_LOG);
                 }
 
-                $this->addLog("Êîíåö èçìåíåíèé â òàáëèöû '{$table}'.", self::PREF_FALSE_LOG);
+                $this->addLog("ÐšÐ¾Ð½ÐµÑ† Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ð¹ Ð² Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ñ‹ '{$table}'.", self::PREF_FALSE_LOG);
             }
         }
 
@@ -113,7 +113,7 @@ class Kernel {
     }
 
     public function addLog($name, $isTrue) {
-        if ($isTrue!='NONE') $name .= $isTrue?" ïðîøëî óñïåøíî!":" âûçâàëî îøèáêó!!!";
+        if ($isTrue!='NONE') $name .= $isTrue?" Ð¿Ñ€Ð¾ÑˆÐ»Ð¾ ÑƒÑÐ¿ÐµÑˆÐ½Ð¾!":" Ð²Ñ‹Ð·Ð²Ð°Ð»Ð¾ Ð¾ÑˆÐ¸Ð±ÐºÑƒ!!!";
         array_push($this->log, $name);
         return $this;
     }
