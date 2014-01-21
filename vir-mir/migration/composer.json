@@ -1,7 +1,7 @@
 {
     "name": "vir-mir/migration",
     "type": "library",
-    "description": "Migrating databases to php",
+    "description": "Migrating databases",
     "keywords": ["migration"],
     "homepage": "http://blog.vir-mir.ru",
     "license": "BSD-3-Clause",
