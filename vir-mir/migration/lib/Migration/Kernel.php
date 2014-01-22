@@ -52,65 +52,59 @@ class Kernel {
         $modifiedTable = $this->getModifiedTable();
         $newTable = $this->getNewTables();
 
-        if (isset($newTable["new"])) {
-            foreach ($newTable["new"] as $table) {
-                $this->addLog("Добавление таблицы '{$table}'", $this->addTable($table));
-            }
-        }
+        $this->_migration($newTable, 'new', function($table, $data) {
+            $this->addLog("Затягивание таблицы '{$table}'", $this->addTable($table));
+        });
 
-        if (isset($newTable["remove"])) {
-            foreach ($newTable["remove"] as $table) {
-                $this->addLog("Затягивание таблицы '{$table}'", $this->removeTable($table));
-            }
-        }
-        if (!empty($modifiedTable)) {
-            foreach ($modifiedTable as $table => $data) {
-                $this->addLog("Страт изменений в таблицы '{$table}'.", self::PREF_FALSE_LOG);
-                if (isset($data['field'])) {
-                    $this->addLog("Страт изменений полей в таблицы '{$table}'.", self::PREF_FALSE_LOG);
-                    foreach (array_keys($data['field']['new']) as $p) {
-                        $this->addLog("Добавление поля '{$p}' в таблицу '{$table}'", $this->addField($table, $p));
-                    } unset($p);
+        $this->_migration($newTable, 'remove', function($table, $data) {
+            $this->addLog("Затягивание таблицы '{$table}'", $this->removeTable($table));
+        });
 
-                    foreach (array_keys($data['field']['remove']) as $p) {
-                        $this->addField($table, $p);
-                        $this->addLog("Удаление поля '{$p}' в таблицы '{$table}'", $this->removeField($table, $p));
-                    } unset($p);
 
-                    foreach (array_keys($data['field']['comparison']) as $p) {
-                        $this->addField($table, $p);
-                        $this->addLog("Изменение поля '{$p}' в таблицы '{$table}'", $this->changeField($table, $p));
-                    } unset($p);
+        $this->_migration($modifiedTable, 'None', function($table, $data) {
+            $this->addLog("Страт изменений в таблицы '{$table}'.", self::PREF_FALSE_LOG);
+            $param = array(
+                'start' => "Страт изменений полей в таблицы '{$table}'.",
+                'new' => "Добавление поля '**' в таблицу '{$table}'",
+                'remove' => "Удаление поля '**' из таблицы '{$table}'",
+                'comparison' => "Изменение поля '**' в таблицы '{$table}'",
+                'end' => "Конец изменений полей в таблицы '{$table}'.",
+            );
 
-                    $this->addLog("Конец изменений полей в таблицы '{$table}'.", self::PREF_FALSE_LOG);
-                }
+            $this->migrationAllField($table, $data, $param, 'Field');
 
-                if (isset($data['index'])) {
-                    $this->addLog("Страт изменений индексов в таблицы '{$table}'.", self::PREF_FALSE_LOG);
-                    foreach (array_keys($data['field']['new']) as $p) {
-                        $this->addLog("Добавление индекса '{$p}' в таблицу '{$table}'", $this->addIndex($table, $p));
-                    } unset($p);
+            $param = array(
+                'start' => "Страт изменений индексов в таблицы '{$table}'.",
+                'new' => "Добавление индекса '**' в таблицу '{$table}'",
+                'remove' => "Удаление индекса '**' из таблицы '{$table}'",
+                'comparison' => "Изменение индекса '**' в таблицы '{$table}'",
+                'end' => "Конец изменений индексов в таблицы '{$table}'.",
+            );
+            $this->migrationAllField($table, $data, $param, 'Index');
 
-                    foreach (array_keys($data['field']['remove']) as $p) {
-                        $this->addField($table, $p);
-                        $this->addLog("Удаление индекса '{$p}' в таблицы '{$table}'", $this->removeIndex($table, $p));
-                    } unset($p);
 
-                    foreach (array_keys($data['field']['comparison']) as $p) {
-                        $this->addField($table, $p);
-                        $this->addLog("Изменение индекса '{$p}' в таблицы '{$table}'", $this->changeIndex($table, $p));
-                    } unset($p);
 
-                    $this->addLog("Конец изменений индексов в таблицы '{$table}'.", self::PREF_FALSE_LOG);
-                }
-
-                $this->addLog("Конец изменений в таблицы '{$table}'.", self::PREF_FALSE_LOG);
-            }
-        }
+            $this->addLog("Конец изменений в таблицы '{$table}'.", self::PREF_FALSE_LOG);
+        });
 
 
         $this->setLog();
     }
+
+
+
+    private function _migration($newTable, $type, $fn) {
+
+        if ($type=='None') {
+            $list = $newTable;
+        } elseif (isset($newTable[$type])) {
+            $list = array_flip($newTable[$type]);
+        } else {
+            return null;
+        }
+        foreach ($list as $table => $data) $fn($table, $data);
+    }
+
 
     public function addLog($name, $isTrue) {
         if ($isTrue!='NONE') $name .= $isTrue?" прошло успешно!":" вызвало ошибку!!!";
@@ -195,6 +189,26 @@ class Kernel {
         $dbTables = array_merge(array_diff_key($dbTables, array_flip(array_merge($new, $old))));
         $this->comparison($dbTables);
         return $dbTables;
+    }
+
+    private function addLogEld($data, $text, $table, $func) {
+        foreach ($data as $p) {
+            $text = str_replace('**', $p, $text);
+            $this->addLog($text, $this->$func($table, $p));
+        }
+        return $this;
+    }
+
+    private function migrationAllField ($table, $data, $param, $func) {
+        if (!isset($data[mb_strtolower($func)])) return null;
+
+        $this->addLog($param['start'], self::PREF_FALSE_LOG);
+
+        $this->addLogEld(array_keys($data[mb_strtolower($func)]['new']), $param['new'], $table, "add{$func}")
+             ->addLogEld(array_keys($data[mb_strtolower($func)]['remove']), $param['remove'], $table, "remove{$func}")
+             ->addLogEld(array_keys($data[mb_strtolower($func)]['comparison']), $param['comparison'], $table, "change{$func}");
+
+        $this->addLog($param['end'], self::PREF_FALSE_LOG);
     }
 
 

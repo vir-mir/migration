@@ -5,7 +5,7 @@
 
     function autoload($name) {
         $name = array_merge((array)'lib', explode('\\', $name));
-        $name = __DIR__ . '/' . implode('/', $name) . '.php';
+        $name = __DIR__ . '/migration/' . implode('/', $name) . '.php';
         include_once $name;
     }
 
@@ -74,7 +74,7 @@
     <title>Migration</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
-    <link href="media/css/bootstrap.min.css" rel="stylesheet">
+    <link href="migration/media/css/bootstrap.min.css" rel="stylesheet">
 
     <style type="text/css">
         .well {
@@ -317,7 +317,7 @@
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://code.jquery.com/jquery.js"></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="media/js/bootstrap.min.js"></script>
+<script src="migration/media/js/bootstrap.min.js"></script>
 <?
     if ($kernel->getCongig('remove_log')) {
         if (file_exists($kernel->logName)) {

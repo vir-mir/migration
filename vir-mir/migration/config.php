@@ -16,6 +16,6 @@ return array(
     ),
 
 
-    'remove_log' => false, // Удолять лог?
+    'remove_log' => true, // Удолять лог?
 
 );
