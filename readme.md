@@ -23,5 +23,5 @@
 
 Файл с конфигурацией тут `/vir-mir/migration/config.php`
 
-Запускаем по ссылке `http://mysite.ru/vir-mir/migration/index.php`
+Запускаем по ссылке `http://mysite.ru/vir-mir/index.php`
 
